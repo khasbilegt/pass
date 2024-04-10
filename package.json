@@ -1,0 +1,69 @@
+{
+  "$schema": "https://www.raycast.com/schemas/extension.json",
+  "name": "pass",
+  "title": "Pass",
+  "description": "Raycast companion extension for pass (the standard unix password manager)",
+  "icon": "icon.png",
+  "author": "khasbilegt",
+  "categories": [
+    "Security",
+    "Productivity",
+    "Data"
+  ],
+  "license": "MIT",
+  "commands": [
+    {
+      "name": "pass",
+      "title": "My Passwords",
+      "subtitle": "Pass",
+      "description": "View all your passwords saved in the store",
+      "mode": "view",
+      "preferences": [
+        {
+          "name": "publicKeyPath",
+          "description": "Armored Public Key",
+          "placeholder": "gpg --export --armor [key-id] > public-key.asc",
+          "type": "file",
+          "required": true,
+          "title": "Public Key"
+        },
+        {
+          "name": "privateKeyPath",
+          "description": "Armored Private Key",
+          "placeholder": "gpg --export-secret-keys --armor [key-id] > private-key.asc",
+          "type": "file",
+          "required": true,
+          "title": "Private Key"
+        },
+        {
+          "name": "passphrase",
+          "description": "Passphrase to access the private key",
+          "type": "password",
+          "required": true,
+          "title": "Passphrase"
+        }
+      ]
+    }
+  ],
+  "dependencies": {
+    "@raycast/api": "^1.69.0",
+    "@raycast/utils": "^1.14.0",
+    "gpg": "^0.6.0",
+    "openpgp": "^5.11.1"
+  },
+  "devDependencies": {
+    "@raycast/eslint-config": "^1.0.6",
+    "@types/node": "20.8.10",
+    "@types/react": "18.2.27",
+    "eslint": "^8.51.0",
+    "prettier": "^3.0.3",
+    "typescript": "^5.2.2"
+  },
+  "scripts": {
+    "build": "ray build -e dist",
+    "dev": "ray develop",
+    "fix-lint": "ray lint --fix",
+    "lint": "ray lint",
+    "publish": "npx @raycast/api@latest publish"
+  }
+}
