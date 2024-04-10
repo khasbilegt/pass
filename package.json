@@ -3,7 +3,7 @@
   "name": "pass",
   "title": "Pass",
   "description": "Raycast companion extension for pass (the standard unix password manager)",
-  "icon": "icon.png",
+  "icon": "shield.png",
   "author": "khasbilegt",
   "categories": [
     "Security",
@@ -11,38 +11,45 @@
     "Data"
   ],
   "license": "MIT",
+  "preferences": [
+    {
+      "name": "publicKeyPath",
+      "description": "Armored Public Key",
+      "placeholder": "gpg --export --armor [key-id] > public-key.asc",
+      "type": "file",
+      "required": true,
+      "title": "Public Key"
+    },
+    {
+      "name": "privateKeyPath",
+      "description": "Armored Private Key",
+      "placeholder": "gpg --export-secret-keys --armor [key-id] > private-key.asc",
+      "type": "file",
+      "required": true,
+      "title": "Private Key"
+    },
+    {
+      "name": "passphrase",
+      "description": "Passphrase to access the private key",
+      "type": "password",
+      "required": true,
+      "title": "Passphrase"
+    }
+  ],
   "commands": [
     {
-      "name": "pass",
-      "title": "My Passwords",
+      "name": "list",
+      "title": "My Items",
       "subtitle": "Pass",
-      "description": "View all your passwords saved in the store",
-      "mode": "view",
-      "preferences": [
-        {
-          "name": "publicKeyPath",
-          "description": "Armored Public Key",
-          "placeholder": "gpg --export --armor [key-id] > public-key.asc",
-          "type": "file",
-          "required": true,
-          "title": "Public Key"
-        },
-        {
-          "name": "privateKeyPath",
-          "description": "Armored Private Key",
-          "placeholder": "gpg --export-secret-keys --armor [key-id] > private-key.asc",
-          "type": "file",
-          "required": true,
-          "title": "Private Key"
-        },
-        {
-          "name": "passphrase",
-          "description": "Passphrase to access the private key",
-          "type": "password",
-          "required": true,
-          "title": "Passphrase"
-        }
-      ]
+      "description": "View all your items saved in the store",
+      "mode": "view"
+    },
+    {
+      "name": "create",
+      "title": "Create Item",
+      "subtitle": "Pass",
+      "description": "Create a new item",
+      "mode": "view"
     }
   ],
   "dependencies": {
