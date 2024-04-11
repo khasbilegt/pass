@@ -1,12 +1,13 @@
 import { Action, ActionPanel, Clipboard, Icon, List } from "@raycast/api";
-import { StorePath, decryptFile, findFiles } from "./utils";
+import { useCachedPromise } from "@raycast/utils";
+import { StorePath, decryptFile, findFilesAsync } from "./utils";
 
 export default function Command() {
-  const files = findFiles(StorePath);
+  const { data: files, isLoading, revalidate } = useCachedPromise(findFilesAsync, [StorePath]);
 
   return (
-    <List filtering={false} searchBarPlaceholder="Search your item...">
-      {files.map((file: string) => {
+    <List filtering={false} searchBarPlaceholder="Search your item..." isLoading={isLoading}>
+      {(files ?? []).map((file: string) => {
         return (
           <List.Item
             key={file}
@@ -21,6 +22,13 @@ export default function Command() {
                     await Clipboard.copy(content as string, { concealed: true });
                   }}
                 />
+                <ActionPanel.Section title="Danger zone">
+                  <Action.Trash
+                    paths={file}
+                    shortcut={{ modifiers: ["ctrl"], key: "x" }}
+                    onTrash={() => revalidate()}
+                  />
+                </ActionPanel.Section>
               </ActionPanel>
             }
           />

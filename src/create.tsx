@@ -1,4 +1,5 @@
-import { Action, ActionPanel, Form, Icon } from "@raycast/api";
+import { Action, ActionPanel, Form, Icon, Toast, popToRoot, showToast } from "@raycast/api";
+import slugify from "@sindresorhus/slugify";
 import fs from "node:fs";
 import path from "node:path";
 import { useState } from "react";
@@ -19,24 +20,35 @@ export default function Command() {
               type,
               favored,
               archived,
+              filename,
               ...values
             }: {
               type: ItemType;
               favored: boolean;
               archived: boolean;
+              filename: string;
             }) => {
+              const toast = await showToast({ style: Toast.Style.Animated, title: "Creating Item" });
+
               try {
                 const now = Date.now();
                 const data = { type, item: values, favored, archived, created: now, modified: now };
                 const payload = JSON.stringify(data);
                 const result = await encryptData(payload, "binary");
-                const filePath = path.join(StorePath, favored ? "favorite" : archived ? "archived" : type, "test.gpg");
+                const filePath = path.join(StorePath, type, `${slugify(filename)}.gpg`);
                 const dirPath = path.dirname(filePath);
 
                 await fs.promises.mkdir(dirPath, { recursive: true });
                 await fs.promises.writeFile(filePath, result as Uint8Array);
+                toast.style = Toast.Style.Success;
+                toast.title = "Created Item";
+                popToRoot();
               } catch (error) {
-                console.log(error);
+                toast.style = Toast.Style.Failure;
+                toast.title = "Failed to upload image";
+                if (error instanceof Error) {
+                  toast.message = error.message;
+                }
               }
             }}
           />
@@ -50,6 +62,7 @@ export default function Command() {
         <Form.Dropdown.Item value="note" title="Secret Note" icon={Icon.Paragraph} />
         <Form.Dropdown.Item value="document" title="Document" icon={Icon.Document} />
       </Form.Dropdown>
+      <Form.TextField id="filename" title="Item Name" placeholder="filename" />
       <Form.Separator />
       <FormFields type={type} />
       <Form.Separator />

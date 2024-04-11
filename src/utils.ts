@@ -65,7 +65,7 @@ export async function encryptData(payload: string, format: "armored" | "binary" 
   return encrypted;
 }
 
-export function findFiles(folderPath: string) {
+export function findFilesSync(folderPath: string) {
   const results: string[] = [];
   const files = fs.readdirSync(folderPath);
 
@@ -74,7 +74,26 @@ export function findFiles(folderPath: string) {
     const stats = fs.lstatSync(filePath);
 
     if (stats.isDirectory()) {
-      results.push(...findFiles(filePath));
+      results.push(...findFilesSync(filePath));
+    } else if (path.extname(filePath) === ".gpg") {
+      results.push(filePath);
+    }
+  }
+
+  return results;
+}
+
+export async function findFilesAsync(folderPath: string) {
+  const results: string[] = [];
+  const files = await fs.promises.readdir(folderPath);
+
+  for (const file of files) {
+    const filePath = path.join(folderPath, file);
+    const stats = await fs.promises.lstat(filePath);
+
+    if (stats.isDirectory()) {
+      const fetchedFiles = await findFilesAsync(filePath);
+      results.push(...fetchedFiles);
     } else if (path.extname(filePath) === ".gpg") {
       results.push(filePath);
     }
