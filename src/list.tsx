@@ -1,5 +1,5 @@
 import { CategoryDropdown, ItemDetail, ItemForm } from "@/components";
-import { CATEGORIES, DEFAULT_CATEGORY, findItems, getCategoryIcon } from "@/utils";
+import { CATEGORIES, findItems, getCategoryIcon } from "@/utils";
 import { Action, ActionPanel, Color, Icon, List } from "@raycast/api";
 import { useCachedPromise, useCachedState } from "@raycast/utils";
 import { ItemCategoryDropdownTypes, ItemListContent } from "./types";
@@ -76,7 +76,7 @@ function getListItemSubtitle(props: ItemListContent) {
 }
 
 export default function ListItems() {
-  const [category, setCategory] = useCachedState<ItemCategoryDropdownTypes>("selected_category", DEFAULT_CATEGORY);
+  const [category, setCategory] = useCachedState<ItemCategoryDropdownTypes>("selected_category", "favored");
   const { data: items = [], isLoading, revalidate } = useCachedPromise(findItems);
   const categoryItems = items?.filter(({ item, archived, favored }) => {
     if (category === "null") return true;
@@ -125,6 +125,7 @@ export default function ListItems() {
                   <ListItemActions {...props} />
                   <Action.Push
                     title="Open Item"
+                    icon={Icon.ArrowRightCircle}
                     target={<ItemDetail {...props} />}
                     shortcut={{ modifiers: ["cmd"], key: "o" }}
                   />
