@@ -3,12 +3,9 @@ import fs from "node:fs";
 import { homedir } from "node:os";
 import path from "node:path";
 import * as openpgp from "openpgp";
-import { Preferences } from "./types";
-
-type LocalStorageKeyType = (typeof LocalStorageKey)[keyof typeof LocalStorageKey];
+import { LocalStorageKey, LocalStorageKeyType, Preferences } from "./types";
 
 export const StorePath = path.join(homedir(), ".password-store");
-export const LocalStorageKey = { PUBLIC: "@public-key", PRIVATE: "@private-key" } as const;
 
 export async function getArmoredKey(key: LocalStorageKeyType) {
   console.log(`getArmoredKey(key: '${key}')`);
@@ -83,7 +80,7 @@ export function findFilesSync(folderPath: string) {
   return results;
 }
 
-export async function findFilesAsync(folderPath: string) {
+export async function findFiles(folderPath: string) {
   const results: string[] = [];
   const files = await fs.promises.readdir(folderPath);
 
@@ -92,7 +89,7 @@ export async function findFilesAsync(folderPath: string) {
     const stats = await fs.promises.lstat(filePath);
 
     if (stats.isDirectory()) {
-      const fetchedFiles = await findFilesAsync(filePath);
+      const fetchedFiles = await findFiles(filePath);
       results.push(...fetchedFiles);
     } else if (path.extname(filePath) === ".gpg") {
       results.push(filePath);
@@ -100,4 +97,8 @@ export async function findFilesAsync(folderPath: string) {
   }
 
   return results;
+}
+
+export async function findItems(folderPath: string) {
+  const results: any[] = [];
 }
