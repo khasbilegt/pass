@@ -16,6 +16,15 @@ import {
 
 export const StorePath = path.join(homedir(), ".password-store");
 export const storePathGlob = new Glob(`${StorePath}/**/*.gpg`, {});
+export const DEFAULT_CATEGORY = "null";
+export const CATEGORIES = {
+  login: { category: "login", title: "Login" },
+  password: { category: "password", title: "Password" },
+  card: { category: "card", title: "Credit Card" },
+  document: { category: "document", title: "Document" },
+  note: { category: "note", title: "Secure Note" },
+  identity: { category: "identity", title: "Identity" },
+} as const;
 
 export async function getArmoredKey(key: LocalStorageKeyType) {
   const storageArmoredKey = await LocalStorage.getItem<string>(key);
@@ -83,7 +92,7 @@ export async function findItems() {
     }
   }
 
-  return results;
+  return results.sort((a, b) => b.created - a.created);
 }
 
 export function hash(str: string) {

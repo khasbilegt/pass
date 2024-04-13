@@ -1,6 +1,6 @@
 import { Action, ActionPanel, Clipboard, Color, Detail, Icon, List, useNavigation } from "@raycast/api";
-import { useCachedPromise } from "@raycast/utils";
-import { decryptFile, findItems, getCategoryIcon } from "./utils";
+import { useCachedPromise, useCachedState } from "@raycast/utils";
+import { CATEGORIES, DEFAULT_CATEGORY, decryptFile, findItems, getCategoryIcon } from "./utils";
 
 function Editor(props: { content: string }) {
   const { pop } = useNavigation();
@@ -49,35 +49,56 @@ function ListActionPanel(props: { file: string; revalidate: () => void }) {
   );
 }
 
+function Categories({ onCategoryChange }: { onCategoryChange: (newCategory: string) => void }) {
+  return (
+    <List.Dropdown defaultValue={DEFAULT_CATEGORY} onChange={onCategoryChange} tooltip="Select Category" storeValue>
+      <List.Dropdown.Item key={"000"} icon={Icon.AppWindowGrid3x3} title="All Categories" value={DEFAULT_CATEGORY} />
+      {Object.values(CATEGORIES)
+        .sort((a, b) => a.title.localeCompare(b.title))
+        .map(({ category, title }) => (
+          <List.Dropdown.Item key={category} icon={getCategoryIcon(category)} title={title} value={category} />
+        ))}
+    </List.Dropdown>
+  );
+}
+
 export default function ListItems() {
+  const [category, setCategory] = useCachedState<string>("selected_category", DEFAULT_CATEGORY);
   const { data: items = [], isLoading, revalidate } = useCachedPromise(findItems, []);
 
+  const categoryItems = category === DEFAULT_CATEGORY ? items : items?.filter(({ item }) => item.category === category);
+  const onCategoryChange = (newCategory: string) => {
+    category !== newCategory && setCategory(newCategory);
+  };
+
   return (
-    <List filtering={false} searchBarPlaceholder="Search your item..." isLoading={isLoading}>
-      {items.length === 0 && !isLoading ? (
+    <List
+      filtering={false}
+      searchBarAccessory={<Categories onCategoryChange={onCategoryChange} />}
+      searchBarPlaceholder="Search your item..."
+      isLoading={isLoading}
+    >
+      {categoryItems.length === 0 && !isLoading ? (
         <List.EmptyView
           title="No items found"
-          description="Any items you have added in 1Password app will be listed here."
+          description="Any items you have added in your password store will be listed here."
         />
       ) : (
-        items.map((item) => {
+        categoryItems.map(({ id, item, path, filename, favored, archived }) => {
           return (
             <List.Item
-              key={item.id}
+              key={id}
+              title={filename}
+              subtitle={item.category === "login" ? item.username : "-"}
               icon={{
-                value: { source: getCategoryIcon(item.item.category), tintColor: Color.Blue },
-                tooltip: item.item.category.charAt(0).toUpperCase() + item.item.category.slice(1),
+                value: { source: getCategoryIcon(item.category), tintColor: Color.Blue },
+                tooltip: CATEGORIES[item.category].title,
               }}
-              title={item.filename}
-              subtitle={item.path}
               accessories={[
-                item.favored ? { icon: { source: Icon.Stars, tintColor: Color.Yellow }, tooltip: "Favorite item" } : {},
-                item.archived
-                  ? { icon: { source: Icon.Folder, tintColor: Color.Yellow }, tooltip: "Archived item" }
-                  : {},
-                // { text: item.vault?.name },
+                favored ? { icon: { source: Icon.Stars, tintColor: Color.Yellow }, tooltip: "Favorite item" } : {},
+                archived ? { icon: { source: Icon.Folder, tintColor: Color.Yellow }, tooltip: "Archived item" } : {},
               ]}
-              actions={<ListActionPanel file={item.path} revalidate={revalidate} />}
+              actions={<ListActionPanel file={path} revalidate={revalidate} />}
             />
           );
         })

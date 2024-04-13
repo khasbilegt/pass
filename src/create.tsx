@@ -5,7 +5,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { useState } from "react";
 import { ItemCategoryType, ItemContent, ItemFileContent } from "./types";
-import { StorePath, encryptData, getCategoryIcon } from "./utils";
+import { CATEGORIES, StorePath, encryptData, getCategoryIcon } from "./utils";
 
 function LoginCategoryFields() {
   return (
@@ -143,14 +143,7 @@ export default function Command() {
         value={type}
         onChange={(value) => setType(value as ItemCategoryType)}
       >
-        {[
-          { category: "login" as const, title: "Login" },
-          { category: "password" as const, title: "Password" },
-          { category: "card" as const, title: "Credit Card" },
-          { category: "identity" as const, title: "Identity" },
-          { category: "note" as const, title: "Secure Note" },
-          { category: "document" as const, title: "Document" },
-        ].map((item) => (
+        {Object.values(CATEGORIES).map((item) => (
           <Form.Dropdown.Item
             key={item.category}
             value={item.category}
