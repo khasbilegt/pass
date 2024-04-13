@@ -6,7 +6,7 @@ import { randomUUID } from "node:crypto";
 import fs from "node:fs";
 import { useState } from "react";
 
-export default function ItemForm(props: {
+export function ItemForm(props: {
   defaultValues: ItemFormValues;
   path: string;
   modified: number;

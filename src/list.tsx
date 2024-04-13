@@ -1,8 +1,7 @@
-import { CategoryDropdown } from "@/components";
+import { CategoryDropdown, ItemDetail, ItemForm } from "@/components";
 import { CATEGORIES, DEFAULT_CATEGORY, findItems, getCategoryIcon } from "@/utils";
 import { Action, ActionPanel, Color, Icon, List } from "@raycast/api";
 import { useCachedPromise, useCachedState } from "@raycast/utils";
-import ItemForm from "./components/ItemForm";
 import { ItemCategoryDropdownTypes, ItemListContent } from "./types";
 
 function ListItemActions(props: ItemListContent) {
@@ -124,6 +123,11 @@ export default function ListItems() {
               actions={
                 <ActionPanel title="Item actions">
                   <ListItemActions {...props} />
+                  <Action.Push
+                    title="Open Item"
+                    target={<ItemDetail {...props} />}
+                    shortcut={{ modifiers: ["cmd"], key: "o" }}
+                  />
                   <ActionPanel.Section title="Management zone">
                     <Action.Push
                       title="Edit Item"
