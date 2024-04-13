@@ -16,6 +16,7 @@ export type ItemContent =
   | { category: "note"; note: string };
 
 export type ItemCategoryType = ItemContent["category"];
+export type ItemCategoryDropdownTypes = ItemCategoryType | "null" | "favored" | "archived";
 export type ExtractCategory<U extends ItemCategoryType> = Extract<ItemContent, { category: U }>;
 
 export type ItemFileContent = {

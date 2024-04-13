@@ -2,7 +2,7 @@ import { CategoryDropdown } from "@/components";
 import { CATEGORIES, DEFAULT_CATEGORY, findItems, getCategoryIcon } from "@/utils";
 import { Action, ActionPanel, Color, Icon, List } from "@raycast/api";
 import { useCachedPromise, useCachedState } from "@raycast/utils";
-import { ItemListContent } from "./types";
+import { ItemCategoryDropdownTypes, ItemListContent } from "./types";
 
 function ListItemActions(props: ItemListContent) {
   const { item } = props;
@@ -76,13 +76,19 @@ function getListItemSubtitle(props: ItemListContent) {
 }
 
 export default function ListItems() {
-  const [category, setCategory] = useCachedState<string>("selected_category", DEFAULT_CATEGORY);
-  const { data: items = [], isLoading, revalidate } = useCachedPromise(findItems, []);
+  const [category, setCategory] = useCachedState<ItemCategoryDropdownTypes>("selected_category", DEFAULT_CATEGORY);
+  const { data: items = [], isLoading, revalidate } = useCachedPromise(findItems);
 
-  const categoryItems = category === DEFAULT_CATEGORY ? items : items?.filter(({ item }) => item.category === category);
-  const onCategoryChange = (newCategory: string) => {
-    category !== newCategory && setCategory(newCategory);
-  };
+  const categoryItems = items?.filter(({ item, archived, favored }) => {
+    if (category === "null") return true;
+    else if (category === "favored") return favored;
+    else if (category === "archived") return archived;
+    else return category === item.category;
+  });
+
+  function onCategoryChange(value: string) {
+    category !== value && setCategory(value as ItemCategoryDropdownTypes);
+  }
 
   return (
     <List

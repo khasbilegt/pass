@@ -17,7 +17,7 @@ import {
 export const StorePath = path.join(homedir(), ".password-store");
 export const storePathGlob = new Glob(`${StorePath}/**/*.gpg`, {});
 export const DEFAULT_CATEGORY = "null";
-export const CATEGORIES = {
+export const CATEGORIES: Record<ItemCategoryType, { category: ItemCategoryType; title: string }> = {
   login: { category: "login", title: "Login" },
   password: { category: "password", title: "Password" },
   card: { category: "card", title: "Credit Card" },
