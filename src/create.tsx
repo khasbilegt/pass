@@ -1,11 +1,11 @@
-import { Action, ActionPanel, Form, Icon, Toast, popToRoot, showToast } from "@raycast/api";
+import { Action, ActionPanel, Form, Toast, popToRoot, showToast } from "@raycast/api";
 import slugify from "@sindresorhus/slugify";
 import { randomUUID } from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import { useState } from "react";
 import { ItemCategoryType, ItemContent, ItemFileContent } from "./types";
-import { StorePath, encryptData } from "./utils";
+import { StorePath, encryptData, getCategoryIcon } from "./utils";
 
 function LoginCategoryFields() {
   return (
@@ -14,6 +14,14 @@ function LoginCategoryFields() {
       <Form.TextField id="username" title="Email/Username" placeholder="user@example.com" />
       <Form.PasswordField id="password" title="Password" placeholder="· · · · · · · · · · · ·" />
       <Form.TextField id="otp" title="OTP Secret" placeholder="otpauth://totp/OTP?secret=..." />
+    </>
+  );
+}
+
+function PasswordCategoryFields() {
+  return (
+    <>
+      <Form.PasswordField id="password" title="Password" />
     </>
   );
 }
@@ -67,6 +75,8 @@ function FormFields({ type }: { type: ItemCategoryType }) {
       return <CardCategoryFields />;
     case "document":
       return <DocumentCategoryFields />;
+    case "password":
+      return <PasswordCategoryFields />;
     case "login":
     default:
       return <LoginCategoryFields />;
@@ -133,11 +143,21 @@ export default function Command() {
         value={type}
         onChange={(value) => setType(value as ItemCategoryType)}
       >
-        <Form.Dropdown.Item value={"login" as ItemCategoryType} title="Login" icon={Icon.Fingerprint} />
-        <Form.Dropdown.Item value={"card" as ItemCategoryType} title="Credit Card" icon={Icon.CreditCard} />
-        <Form.Dropdown.Item value={"identity" as ItemCategoryType} title="Identity" icon={Icon.Person} />
-        <Form.Dropdown.Item value={"note" as ItemCategoryType} title="Secret Note" icon={Icon.Paragraph} />
-        <Form.Dropdown.Item value={"document" as ItemCategoryType} title="Document" icon={Icon.Document} />
+        {[
+          { category: "login" as const, title: "Login" },
+          { category: "password" as const, title: "Password" },
+          { category: "card" as const, title: "Credit Card" },
+          { category: "identity" as const, title: "Identity" },
+          { category: "note" as const, title: "Secure Note" },
+          { category: "document" as const, title: "Document" },
+        ].map((item) => (
+          <Form.Dropdown.Item
+            key={item.category}
+            value={item.category}
+            title={item.title}
+            icon={getCategoryIcon(item.category)}
+          />
+        ))}
       </Form.Dropdown>
       <Form.TextField id="filename" title="Item Name" placeholder="filename" />
       <Form.Separator />

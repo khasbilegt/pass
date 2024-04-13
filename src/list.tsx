@@ -1,6 +1,6 @@
-import { Action, ActionPanel, Clipboard, Detail, Icon, List, useNavigation } from "@raycast/api";
+import { Action, ActionPanel, Clipboard, Color, Detail, Icon, List, useNavigation } from "@raycast/api";
 import { useCachedPromise } from "@raycast/utils";
-import { decryptFile, findItems } from "./utils";
+import { decryptFile, findItems, getCategoryIcon } from "./utils";
 
 function Editor(props: { content: string }) {
   const { pop } = useNavigation();
@@ -64,7 +64,19 @@ export default function ListItems() {
           return (
             <List.Item
               key={item.id}
-              title={item.filename ?? "Item title"}
+              icon={{
+                value: { source: getCategoryIcon(item.item.category), tintColor: Color.Blue },
+                tooltip: item.item.category.charAt(0).toUpperCase() + item.item.category.slice(1),
+              }}
+              title={item.filename}
+              subtitle={item.path}
+              accessories={[
+                item.favored ? { icon: { source: Icon.Stars, tintColor: Color.Yellow }, tooltip: "Favorite item" } : {},
+                item.archived
+                  ? { icon: { source: Icon.Folder, tintColor: Color.Yellow }, tooltip: "Archived item" }
+                  : {},
+                // { text: item.vault?.name },
+              ]}
               actions={<ListActionPanel file={item.path} revalidate={revalidate} />}
             />
           );

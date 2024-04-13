@@ -1,11 +1,18 @@
-import { getPreferenceValues, LocalStorage } from "@raycast/api";
+import { getPreferenceValues, Icon, LocalStorage } from "@raycast/api";
 import { Glob } from "glob";
 import { createHash } from "node:crypto";
 import fs from "node:fs";
 import { homedir } from "node:os";
 import path from "node:path";
 import * as openpgp from "openpgp";
-import { ItemFileContent, ItemListContent, LocalStorageKey, LocalStorageKeyType, Preferences } from "./types";
+import {
+  ItemCategoryType,
+  ItemFileContent,
+  ItemListContent,
+  LocalStorageKey,
+  LocalStorageKeyType,
+  Preferences,
+} from "./types";
 
 export const StorePath = path.join(homedir(), ".password-store");
 export const storePathGlob = new Glob(`${StorePath}/**/*.gpg`, {});
@@ -81,4 +88,23 @@ export async function findItems() {
 
 export function hash(str: string) {
   return createHash("sha256").update(str).digest("hex");
+}
+
+export function getCategoryIcon(category: ItemCategoryType) {
+  switch (category) {
+    case "card":
+      return Icon.CreditCard;
+    case "document":
+      return Icon.Document;
+    case "identity":
+      return Icon.Person;
+    case "login":
+      return Icon.Fingerprint;
+    case "password":
+      return Icon.Key;
+    case "note":
+      return Icon.Paragraph;
+    default:
+      return Icon.Key;
+  }
 }
