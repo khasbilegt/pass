@@ -1,17 +1,32 @@
 import { ExtractCategory, ItemCategoryType, ItemFormValues } from "@/types";
 import { Form } from "@raycast/api";
+import { useState } from "react";
 
 function LoginCategoryFields({ defaultValues }: { defaultValues?: ExtractCategory<"login"> }) {
+  const [password, setPassword] = useState(defaultValues?.password ?? "I 4M SH3R L0CK3D");
+
   return (
     <>
-      <Form.TextField id="website" title="Website" placeholder="example.com" defaultValue={defaultValues?.website} />
+      <Form.TextField
+        id="website"
+        title="Website"
+        placeholder="https://www.bafs.org.uk/"
+        defaultValue={defaultValues?.website}
+      />
       <Form.TextField
         id="username"
         title="Email/Username"
-        placeholder="user@example.com"
+        placeholder="SherlockH"
         defaultValue={defaultValues?.username}
       />
-      <Form.PasswordField id="password" title="Password" placeholder="· · · · · · · · · · · ·" />
+      <Form.PasswordField
+        id="password"
+        title="Password"
+        placeholder="· · · · · · · · · · · ·"
+        value={password}
+        onChange={setPassword}
+        info={`Raw value: ${password}`}
+      />
       <Form.TextField
         id="otp"
         title="OTP Secret"
@@ -22,23 +37,23 @@ function LoginCategoryFields({ defaultValues }: { defaultValues?: ExtractCategor
   );
 }
 
-function PasswordCategoryFields() {
-  return (
-    <>
-      <Form.PasswordField id="password" title="Password" />
-    </>
-  );
-}
+function PasswordCategoryFields({ defaultValues }: { defaultValues?: ExtractCategory<"password"> }) {
+  const [password, setPassword] = useState(defaultValues?.password ?? "I 4M SH3R L0CK3D");
 
-function NoteCategoryFields({ defaultValues }: { defaultValues?: ExtractCategory<"note"> }) {
   return (
-    <>
-      <Form.TextArea id="note" title="Note" defaultValue={defaultValues?.note} />
-    </>
+    <Form.PasswordField
+      id="password"
+      title="Password"
+      value={password}
+      onChange={setPassword}
+      info={`Raw value: ${password}`}
+    />
   );
 }
 
 function CardCategoryFields({ defaultValues }: { defaultValues?: ExtractCategory<"card"> }) {
+  const [cvv, setCVV] = useState(defaultValues?.cvv ?? "000");
+
   return (
     <>
       <Form.TextField id="name" title="Name" defaultValue={defaultValues?.name} />
@@ -49,7 +64,7 @@ function CardCategoryFields({ defaultValues }: { defaultValues?: ExtractCategory
         type={Form.DatePicker.Type.Date}
         defaultValue={defaultValues?.expiration ? new Date(defaultValues.expiration) : undefined}
       />
-      <Form.TextField id="cvv" title="CVV" defaultValue={defaultValues?.cvv} />
+      <Form.PasswordField id="cvv" title="CVV" value={cvv} onChange={setCVV} info={`Raw value: ${cvv}`} />
     </>
   );
 }
@@ -63,8 +78,8 @@ function DocumentCategoryFields({ defaultValues }: { defaultValues?: ExtractCate
 function IdentityCategoryFields({ defaultValues }: { defaultValues?: ExtractCategory<"identity"> }) {
   return (
     <>
-      <Form.TextField id="firstname" title="Firstname" defaultValue={defaultValues?.firstname} />
-      <Form.TextField id="lastname" title="Lastname" defaultValue={defaultValues?.lastname} />
+      <Form.TextField id="firstname" title="Firstname" placeholder="Sherlock" defaultValue={defaultValues?.firstname} />
+      <Form.TextField id="lastname" title="Lastname" placeholder="Holmes" defaultValue={defaultValues?.lastname} />
       <Form.DatePicker
         id="birthdate"
         title="Birthdate"
@@ -72,8 +87,25 @@ function IdentityCategoryFields({ defaultValues }: { defaultValues?: ExtractCate
         defaultValue={defaultValues?.birthdate ? new Date(defaultValues.birthdate) : undefined}
       />
       <Form.TextField id="tel" title="Phone number" defaultValue={defaultValues?.tel} />
-      <Form.TextArea id="address" title="Address" defaultValue={defaultValues?.address} />
+      <Form.TextArea
+        id="address"
+        title="Address"
+        placeholder="221B Baker Street, London, UK"
+        defaultValue={defaultValues?.address}
+      />
     </>
+  );
+}
+
+function NoteCategoryFields({ defaultValues }: { defaultValues?: ExtractCategory<"note"> }) {
+  return (
+    <Form.TextArea
+      id="note"
+      title="Secure Note"
+      placeholder="Look not to the obvious, but seek the shadows that hide the truth. The key lies in the spaces between the lines..."
+      defaultValue={defaultValues?.note}
+      enableMarkdown
+    />
   );
 }
 
@@ -88,7 +120,7 @@ export function FormFields({ type, draftValues }: { type: ItemCategoryType; draf
     case "document":
       return <DocumentCategoryFields defaultValues={draftValues as ExtractCategory<"document">} />;
     case "password":
-      return <PasswordCategoryFields />;
+      return <PasswordCategoryFields defaultValues={draftValues as ExtractCategory<"password">} />;
     case "login":
     default:
       return <LoginCategoryFields defaultValues={draftValues as ExtractCategory<"login">} />;

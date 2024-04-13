@@ -73,8 +73,8 @@ export default function Command(props: LaunchProps<{ draftValues: ItemFormValues
       <Form.Separator />
       <FormFields type={type} draftValues={draftValues} />
       <Form.Separator />
-      <Form.Checkbox id="favored" label="Mark as favorite?" defaultValue={!!draftValues?.favored} />
-      <Form.Checkbox id="archived" label="Mark as archived?" defaultValue={!!draftValues?.archived} />
+      <Form.Checkbox id="favored" label="Add to Favorite?" defaultValue={!!draftValues?.favored} />
+      <Form.Checkbox id="archived" label="Add to Archived?" defaultValue={!!draftValues?.archived} />
     </Form>
   );
 }
