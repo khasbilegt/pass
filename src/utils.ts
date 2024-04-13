@@ -88,7 +88,7 @@ export async function findItems() {
         results.push({ ...payload, path: file });
       }
     } catch (error) {
-      console.error(error);
+      console.error("Invalid schema!", file);
     }
   }
 

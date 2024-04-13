@@ -1,25 +1,9 @@
-import { Action, ActionPanel, Clipboard, Color, Detail, Icon, List, useNavigation } from "@raycast/api";
+import { CategoryDropdown } from "@/components";
+import { CATEGORIES, DEFAULT_CATEGORY, decryptFile, findItems, getCategoryIcon } from "@/utils";
+import { Action, ActionPanel, Clipboard, Color, Icon, List } from "@raycast/api";
 import { useCachedPromise, useCachedState } from "@raycast/utils";
-import { CATEGORIES, DEFAULT_CATEGORY, decryptFile, findItems, getCategoryIcon } from "./utils";
-
-function Editor(props: { content: string }) {
-  const { pop } = useNavigation();
-
-  return (
-    <Detail
-      markdown={props.content}
-      actions={
-        <ActionPanel>
-          <Action title="Go Back" onAction={pop} />
-        </ActionPanel>
-      }
-    />
-  );
-}
 
 function ListActionPanel(props: { file: string; revalidate: () => void }) {
-  const { push } = useNavigation();
-
   return (
     <ActionPanel title="Item actions">
       <Action
@@ -31,12 +15,10 @@ function ListActionPanel(props: { file: string; revalidate: () => void }) {
         }}
       />
       <Action
-        title="Edit Raw"
-        icon={Icon.Pencil}
-        onAction={async () => {
-          const content = await decryptFile(props.file);
-          push(<Editor content={String(content)} />);
-        }}
+        title="Sync Items"
+        icon={Icon.RotateClockwise}
+        onAction={() => props.revalidate}
+        shortcut={{ modifiers: ["cmd"], key: "r" }}
       />
       <ActionPanel.Section title="Danger zone">
         <Action.Trash
@@ -46,19 +28,6 @@ function ListActionPanel(props: { file: string; revalidate: () => void }) {
         />
       </ActionPanel.Section>
     </ActionPanel>
-  );
-}
-
-function Categories({ onCategoryChange }: { onCategoryChange: (newCategory: string) => void }) {
-  return (
-    <List.Dropdown defaultValue={DEFAULT_CATEGORY} onChange={onCategoryChange} tooltip="Select Category" storeValue>
-      <List.Dropdown.Item key={"000"} icon={Icon.AppWindowGrid3x3} title="All Categories" value={DEFAULT_CATEGORY} />
-      {Object.values(CATEGORIES)
-        .sort((a, b) => a.title.localeCompare(b.title))
-        .map(({ category, title }) => (
-          <List.Dropdown.Item key={category} icon={getCategoryIcon(category)} title={title} value={category} />
-        ))}
-    </List.Dropdown>
   );
 }
 
@@ -74,7 +43,7 @@ export default function ListItems() {
   return (
     <List
       filtering={false}
-      searchBarAccessory={<Categories onCategoryChange={onCategoryChange} />}
+      searchBarAccessory={<CategoryDropdown onCategoryChange={onCategoryChange} />}
       searchBarPlaceholder="Search your item..."
       isLoading={isLoading}
     >
