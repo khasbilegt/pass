@@ -1,13 +1,23 @@
-import { ItemCategoryType } from "@/types";
+import { ExtractCategory, ItemCategoryType, ItemFormValues } from "@/types";
 import { Form } from "@raycast/api";
 
-function LoginCategoryFields() {
+function LoginCategoryFields({ defaultValues }: { defaultValues?: ExtractCategory<"login"> }) {
   return (
     <>
-      <Form.TextField id="website" title="Website" placeholder="example.com" />
-      <Form.TextField id="username" title="Email/Username" placeholder="user@example.com" />
+      <Form.TextField id="website" title="Website" placeholder="example.com" defaultValue={defaultValues?.website} />
+      <Form.TextField
+        id="username"
+        title="Email/Username"
+        placeholder="user@example.com"
+        defaultValue={defaultValues?.username}
+      />
       <Form.PasswordField id="password" title="Password" placeholder="· · · · · · · · · · · ·" />
-      <Form.TextField id="otp" title="OTP Secret" placeholder="otpauth://totp/OTP?secret=..." />
+      <Form.TextField
+        id="otp"
+        title="OTP Secret"
+        placeholder="otpauth://totp/OTP?secret=..."
+        defaultValue={defaultValues?.otp}
+      />
     </>
   );
 }
@@ -20,59 +30,67 @@ function PasswordCategoryFields() {
   );
 }
 
-function NoteCategoryFields() {
+function NoteCategoryFields({ defaultValues }: { defaultValues?: ExtractCategory<"note"> }) {
   return (
     <>
-      <Form.TextArea id="note" title="Note" />
+      <Form.TextArea id="note" title="Note" defaultValue={defaultValues?.note} />
     </>
   );
 }
 
-function CardCategoryFields() {
+function CardCategoryFields({ defaultValues }: { defaultValues?: ExtractCategory<"card"> }) {
   return (
     <>
-      <Form.TextField id="name" title="Name" />
-      <Form.TextField id="number" title="Card Number" />
-      <Form.DatePicker id="expiration" title="Expiry Date" type={Form.DatePicker.Type.Date} />
-      <Form.TextField id="cvv" title="CVV" />
+      <Form.TextField id="name" title="Name" defaultValue={defaultValues?.name} />
+      <Form.TextField id="number" title="Card Number" defaultValue={defaultValues?.number} />
+      <Form.DatePicker
+        id="expiration"
+        title="Expiry Date"
+        type={Form.DatePicker.Type.Date}
+        defaultValue={defaultValues?.expiration ? new Date(defaultValues.expiration) : undefined}
+      />
+      <Form.TextField id="cvv" title="CVV" defaultValue={defaultValues?.cvv} />
     </>
   );
 }
 
-function DocumentCategoryFields() {
+function DocumentCategoryFields({ defaultValues }: { defaultValues?: ExtractCategory<"document"> }) {
+  return (
+    <Form.FilePicker id="file" title="Document" defaultValue={defaultValues?.file ? [defaultValues.file] : undefined} />
+  );
+}
+
+function IdentityCategoryFields({ defaultValues }: { defaultValues?: ExtractCategory<"identity"> }) {
   return (
     <>
-      <Form.FilePicker id="file" title="Document" />
+      <Form.TextField id="firstname" title="Firstname" defaultValue={defaultValues?.firstname} />
+      <Form.TextField id="lastname" title="Lastname" defaultValue={defaultValues?.lastname} />
+      <Form.DatePicker
+        id="birthdate"
+        title="Birthdate"
+        type={Form.DatePicker.Type.Date}
+        defaultValue={defaultValues?.birthdate ? new Date(defaultValues.birthdate) : undefined}
+      />
+      <Form.TextField id="tel" title="Phone number" defaultValue={defaultValues?.tel} />
+      <Form.TextArea id="address" title="Address" defaultValue={defaultValues?.address} />
     </>
   );
 }
 
-function IdentityCategoryFields() {
-  return (
-    <>
-      <Form.TextField id="firstname" title="Firstname" />
-      <Form.TextField id="lastname" title="Lastname" />
-      <Form.DatePicker id="birthdate" title="Birthdate" type={Form.DatePicker.Type.Date} />
-      <Form.TextField id="tel" title="Phone number" />
-      <Form.TextArea id="address" title="Address" />
-    </>
-  );
-}
-
-export function FormFields({ type }: { type: ItemCategoryType }) {
+export function FormFields({ type, draftValues }: { type: ItemCategoryType; draftValues?: ItemFormValues }) {
   switch (type) {
     case "identity":
-      return <IdentityCategoryFields />;
+      return <IdentityCategoryFields defaultValues={draftValues as ExtractCategory<"identity">} />;
     case "note":
-      return <NoteCategoryFields />;
+      return <NoteCategoryFields defaultValues={draftValues as ExtractCategory<"note">} />;
     case "card":
-      return <CardCategoryFields />;
+      return <CardCategoryFields defaultValues={draftValues as ExtractCategory<"card">} />;
     case "document":
-      return <DocumentCategoryFields />;
+      return <DocumentCategoryFields defaultValues={draftValues as ExtractCategory<"document">} />;
     case "password":
       return <PasswordCategoryFields />;
     case "login":
     default:
-      return <LoginCategoryFields />;
+      return <LoginCategoryFields defaultValues={draftValues as ExtractCategory<"login">} />;
   }
 }

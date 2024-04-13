@@ -1,34 +1,78 @@
 import { CategoryDropdown } from "@/components";
-import { CATEGORIES, DEFAULT_CATEGORY, decryptFile, findItems, getCategoryIcon } from "@/utils";
-import { Action, ActionPanel, Clipboard, Color, Icon, List } from "@raycast/api";
+import { CATEGORIES, DEFAULT_CATEGORY, findItems, getCategoryIcon } from "@/utils";
+import { Action, ActionPanel, Color, Icon, List } from "@raycast/api";
 import { useCachedPromise, useCachedState } from "@raycast/utils";
+import { ItemListContent } from "./types";
 
-function ListActionPanel(props: { file: string; revalidate: () => void }) {
-  return (
-    <ActionPanel title="Item actions">
-      <Action
-        title="Copy to Clipboard"
-        icon={Icon.Clipboard}
-        onAction={async () => {
-          const content = await decryptFile(props.file);
-          await Clipboard.copy(content as string, { concealed: true });
-        }}
-      />
-      <Action
-        title="Sync Items"
-        icon={Icon.RotateClockwise}
-        onAction={() => props.revalidate}
-        shortcut={{ modifiers: ["cmd"], key: "r" }}
-      />
-      <ActionPanel.Section title="Danger zone">
-        <Action.Trash
-          paths={props.file}
-          shortcut={{ modifiers: ["ctrl"], key: "x" }}
-          onTrash={() => props.revalidate()}
-        />
-      </ActionPanel.Section>
-    </ActionPanel>
-  );
+function ListItemActions(props: ItemListContent) {
+  const { item } = props;
+
+  switch (item.category) {
+    case "login":
+      return (
+        <>
+          <Action.CopyToClipboard title="Copy Username" content={item.username} />
+          <Action.CopyToClipboard title="Copy Password" content={item.password} concealed />
+          {item.otp ?? (
+            <Action.CopyToClipboard
+              title="Copy OTP"
+              content={item.password}
+              shortcut={{ modifiers: ["cmd", "shift"], key: "c" }}
+            />
+          )}
+        </>
+      );
+    case "password":
+      return <Action.CopyToClipboard title="Copy Password" content={item.password} />;
+    case "note":
+      return <Action.CopyToClipboard title="Copy Note" content={item.note} />;
+    case "card":
+      return (
+        <>
+          <Action.CopyToClipboard title="Copy Card Number" content={item.number} />
+          <Action.CopyToClipboard title="Copy CVV" content={item.cvv} concealed />
+          <Action.CopyToClipboard
+            title="Copy Expiry Date"
+            content={item.expiration}
+            shortcut={{ modifiers: ["cmd", "shift"], key: "c" }}
+          />
+        </>
+      );
+    case "identity":
+      return (
+        <>
+          <Action.CopyToClipboard title="Copy Fullname" content={`${item.firstname} ${item.lastname}`} />
+          <Action.CopyToClipboard title="Copy Phone Number" content={item.tel} concealed />
+          <Action.CopyToClipboard
+            title="Copy Address"
+            content={item.address}
+            shortcut={{ modifiers: ["cmd", "shift"], key: "c" }}
+          />
+        </>
+      );
+    case "document":
+    default:
+      return null;
+  }
+}
+
+function getListItemSubtitle(props: ItemListContent) {
+  const { item } = props;
+
+  switch (item.category) {
+    case "login":
+      return item.username;
+    case "card":
+      return item.number.length === 16
+        ? `${item.number.slice(0, 4)} * * * * ${item.number.slice(-4)}`
+        : item.number.length === 15
+          ? `${item.number.slice(0, 4)} * * * * ${item.number.slice(-5)}`
+          : item.number;
+    case "identity":
+      return `${item.firstname} ${item.lastname}`;
+    default:
+      return undefined;
+  }
 }
 
 export default function ListItems() {
@@ -42,9 +86,9 @@ export default function ListItems() {
 
   return (
     <List
-      filtering={false}
+      filtering
       searchBarAccessory={<CategoryDropdown onCategoryChange={onCategoryChange} />}
-      searchBarPlaceholder="Search your item..."
+      searchBarPlaceholder="Search your item"
       isLoading={isLoading}
     >
       {categoryItems.length === 0 && !isLoading ? (
@@ -53,21 +97,36 @@ export default function ListItems() {
           description="Any items you have added in your password store will be listed here."
         />
       ) : (
-        categoryItems.map(({ id, item, path, filename, favored, archived }) => {
+        categoryItems.map((props) => {
+          const { id, item, path, filename, favored, archived } = props;
+
           return (
             <List.Item
               key={id}
               title={filename}
-              subtitle={item.category === "login" ? item.username : "-"}
+              subtitle={getListItemSubtitle(props)}
               icon={{
                 value: { source: getCategoryIcon(item.category), tintColor: Color.Blue },
                 tooltip: CATEGORIES[item.category].title,
               }}
               accessories={[
                 favored ? { icon: { source: Icon.Stars, tintColor: Color.Yellow }, tooltip: "Favorite item" } : {},
-                archived ? { icon: { source: Icon.Folder, tintColor: Color.Yellow }, tooltip: "Archived item" } : {},
+                archived ? { icon: { source: Icon.Tray, tintColor: Color.Yellow }, tooltip: "Archived item" } : {},
               ]}
-              actions={<ListActionPanel file={path} revalidate={revalidate} />}
+              actions={
+                <ActionPanel title="Item actions">
+                  <ListItemActions {...props} />
+                  <Action
+                    title="Sync Items"
+                    icon={Icon.RotateClockwise}
+                    onAction={revalidate}
+                    shortcut={{ modifiers: ["cmd"], key: "r" }}
+                  />
+                  <ActionPanel.Section title="Danger zone">
+                    <Action.Trash paths={path} shortcut={{ modifiers: ["ctrl"], key: "x" }} onTrash={revalidate} />
+                  </ActionPanel.Section>
+                </ActionPanel>
+              }
             />
           );
         })

@@ -1,26 +1,18 @@
 import { FormFields } from "@/components";
-import { ItemCategoryType, ItemContent, ItemFileContent } from "@/types";
+import { ItemCategoryType, ItemFileContent, ItemFormValues } from "@/types";
 import { CATEGORIES, StorePath, encryptData, getCategoryIcon } from "@/utils";
-import { Action, ActionPanel, Form, Toast, popToRoot, showToast } from "@raycast/api";
+import { Action, ActionPanel, Form, LaunchProps, Toast, popToRoot, showToast } from "@raycast/api";
 import slugify from "@sindresorhus/slugify";
 import { randomUUID } from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import { useState } from "react";
 
-export default function Command() {
-  const [type, setType] = useState<ItemCategoryType>("login");
+export default function Command(props: LaunchProps<{ draftValues: ItemFormValues }>) {
+  const { draftValues } = props;
+  const [type, setType] = useState<ItemCategoryType>(draftValues?.category ?? "login");
 
-  async function onSubmit({
-    favored,
-    archived,
-    filename,
-    ...values
-  }: {
-    favored: boolean;
-    archived: boolean;
-    filename: string;
-  } & ItemContent) {
+  async function onSubmit({ favored, archived, filename, ...values }: ItemFormValues) {
     const toast = await showToast({ style: Toast.Style.Animated, title: "Creating Item" });
 
     try {
@@ -77,12 +69,12 @@ export default function Command() {
           />
         ))}
       </Form.Dropdown>
-      <Form.TextField id="filename" title="Item Name" placeholder="filename" />
+      <Form.TextField id="filename" title="Item Name" placeholder="filename" defaultValue={draftValues?.filename} />
       <Form.Separator />
-      <FormFields type={type} />
+      <FormFields type={type} draftValues={draftValues} />
       <Form.Separator />
-      <Form.Checkbox id="favored" label="Mark as favorite?" defaultValue={false} />
-      <Form.Checkbox id="archived" label="Mark as archived?" defaultValue={false} />
+      <Form.Checkbox id="favored" label="Mark as favorite?" defaultValue={!!draftValues?.favored} />
+      <Form.Checkbox id="archived" label="Mark as archived?" defaultValue={!!draftValues?.archived} />
     </Form>
   );
 }

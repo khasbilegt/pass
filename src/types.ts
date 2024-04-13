@@ -16,6 +16,7 @@ export type ItemContent =
   | { category: "note"; note: string };
 
 export type ItemCategoryType = ItemContent["category"];
+export type ExtractCategory<U extends ItemCategoryType> = Extract<ItemContent, { category: U }>;
 
 export type ItemFileContent = {
   id: string;
@@ -28,3 +29,9 @@ export type ItemFileContent = {
 };
 
 export type ItemListContent = { path: string } & ItemFileContent;
+
+export type ItemFormValues = {
+  filename: string;
+  favored: boolean;
+  archived: boolean;
+} & ItemContent;
