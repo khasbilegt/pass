@@ -1,6 +1,6 @@
 import { Action, ActionPanel, Clipboard, Detail, Icon, List, useNavigation } from "@raycast/api";
 import { useCachedPromise } from "@raycast/utils";
-import { StorePath, decryptFile, findFiles } from "./utils";
+import { decryptFile, findItems } from "./utils";
 
 function Editor(props: { content: string }) {
   const { pop } = useNavigation();
@@ -49,23 +49,27 @@ function ListActionPanel(props: { file: string; revalidate: () => void }) {
   );
 }
 
-export default function Command() {
-  const { data: files, isLoading, revalidate } = useCachedPromise(findFiles, [StorePath]);
+export default function ListItems() {
+  const { data: items = [], isLoading, revalidate } = useCachedPromise(findItems, []);
 
   return (
-    <List filtering={false} searchBarPlaceholder="Search your item..." isLoading={isLoading} isShowingDetail>
-      {(files ?? []).map((file: string) => {
-        return (
-          <List.Item
-            key={file}
-            title={file.replaceAll(StorePath, "")}
-            detail={
-              <List.Item.Detail markdown="![Illustration](https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png)" />
-            }
-            actions={<ListActionPanel file={file} revalidate={revalidate} />}
-          />
-        );
-      })}
+    <List filtering={false} searchBarPlaceholder="Search your item..." isLoading={isLoading}>
+      {items.length === 0 && !isLoading ? (
+        <List.EmptyView
+          title="No items found"
+          description="Any items you have added in 1Password app will be listed here."
+        />
+      ) : (
+        items.map((item) => {
+          return (
+            <List.Item
+              key={item.id}
+              title={item.filename ?? "Item title"}
+              actions={<ListActionPanel file={item.path} revalidate={revalidate} />}
+            />
+          );
+        })
+      )}
     </List>
   );
 }

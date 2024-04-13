@@ -1,9 +1,10 @@
 import { Action, ActionPanel, Form, Icon, Toast, popToRoot, showToast } from "@raycast/api";
 import slugify from "@sindresorhus/slugify";
+import { randomUUID } from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import { useState } from "react";
-import { ItemCategoryType, ItemFileContent } from "./types";
+import { ItemCategoryType, ItemContent, ItemFileContent } from "./types";
 import { StorePath, encryptData } from "./utils";
 
 function LoginCategoryFields() {
@@ -79,25 +80,25 @@ export default function Command() {
     favored,
     archived,
     filename,
-    category,
     ...values
   }: {
-    category: ItemCategoryType;
     favored: boolean;
     archived: boolean;
     filename: string;
-  }) {
+  } & ItemContent) {
     const toast = await showToast({ style: Toast.Style.Animated, title: "Creating Item" });
 
     try {
       const now = Date.now();
-      const data = {
-        item: { ...values, category },
+      const data: ItemFileContent = {
+        id: randomUUID(),
+        filename,
+        item: values,
         favored,
         archived,
         created: now,
         modified: now,
-      } as ItemFileContent;
+      };
       const payload = JSON.stringify(data);
       const result = await encryptData(payload, "binary");
       const filePath = path.join(StorePath, type, `${slugify(filename)}.gpg`);

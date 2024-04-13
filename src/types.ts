@@ -24,9 +24,13 @@ export type ItemContent =
   | { category: "note"; note: string };
 
 export type ItemFileContent = {
+  id: string;
+  filename: string;
   favored: boolean;
   archived: boolean;
   item: ItemContent;
   created: number;
   modified: number;
 };
+
+export type ItemListContent = { path: string } & ItemFileContent;

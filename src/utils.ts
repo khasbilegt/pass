@@ -1,27 +1,26 @@
 import { getPreferenceValues, LocalStorage } from "@raycast/api";
+import { Glob } from "glob";
+import { createHash } from "node:crypto";
 import fs from "node:fs";
 import { homedir } from "node:os";
 import path from "node:path";
 import * as openpgp from "openpgp";
-import { LocalStorageKey, LocalStorageKeyType, Preferences } from "./types";
+import { ItemFileContent, ItemListContent, LocalStorageKey, LocalStorageKeyType, Preferences } from "./types";
 
 export const StorePath = path.join(homedir(), ".password-store");
+export const storePathGlob = new Glob(`${StorePath}/**/*.gpg`, {});
 
 export async function getArmoredKey(key: LocalStorageKeyType) {
-  console.log(`getArmoredKey(key: '${key}')`);
   const storageArmoredKey = await LocalStorage.getItem<string>(key);
 
   if (storageArmoredKey === undefined) {
-    console.log("> Key is not in the local storage!");
     const { privateKeyPath, publicKeyPath } = getPreferenceValues<Preferences>();
     const keyPath = key === LocalStorageKey.PRIVATE ? privateKeyPath : publicKeyPath;
     const armoredKey = await fs.promises.readFile(keyPath, "utf-8");
     await LocalStorage.setItem(key, armoredKey);
-    console.log("> Key is read from the file, saved in the storage and returned!");
     return armoredKey;
   }
 
-  console.log("> Key is read from the storage!");
   return storageArmoredKey;
 }
 
@@ -62,43 +61,24 @@ export async function encryptData(payload: string, format: "armored" | "binary" 
   return encrypted;
 }
 
-export function findFilesSync(folderPath: string) {
-  const results: string[] = [];
-  const files = fs.readdirSync(folderPath);
+export async function findItems() {
+  const results: ItemListContent[] = [];
 
-  for (const file of files) {
-    const filePath = path.join(folderPath, file);
-    const stats = fs.lstatSync(filePath);
-
-    if (stats.isDirectory()) {
-      results.push(...findFilesSync(filePath));
-    } else if (path.extname(filePath) === ".gpg") {
-      results.push(filePath);
+  for await (const file of storePathGlob) {
+    try {
+      const data = await decryptFile(file);
+      if (typeof data === "string") {
+        const payload: ItemFileContent = JSON.parse(data);
+        results.push({ ...payload, path: file });
+      }
+    } catch (error) {
+      console.error(error);
     }
   }
 
   return results;
 }
 
-export async function findFiles(folderPath: string) {
-  const results: string[] = [];
-  const files = await fs.promises.readdir(folderPath);
-
-  for (const file of files) {
-    const filePath = path.join(folderPath, file);
-    const stats = await fs.promises.lstat(filePath);
-
-    if (stats.isDirectory()) {
-      const fetchedFiles = await findFiles(filePath);
-      results.push(...fetchedFiles);
-    } else if (path.extname(filePath) === ".gpg") {
-      results.push(filePath);
-    }
-  }
-
-  return results;
-}
-
-export async function findItems(folderPath: string) {
-  const results: any[] = [];
+export function hash(str: string) {
+  return createHash("sha256").update(str).digest("hex");
 }
