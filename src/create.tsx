@@ -38,7 +38,7 @@ export default function Command(props: LaunchProps<{ draftValues: ItemFormValues
       popToRoot();
     } catch (error) {
       toast.style = Toast.Style.Failure;
-      toast.title = "Failed to upload image";
+      toast.title = "Failed to create item";
       if (error instanceof Error) {
         toast.message = error.message;
       }

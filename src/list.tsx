@@ -2,6 +2,7 @@ import { CategoryDropdown } from "@/components";
 import { CATEGORIES, DEFAULT_CATEGORY, findItems, getCategoryIcon } from "@/utils";
 import { Action, ActionPanel, Color, Icon, List } from "@raycast/api";
 import { useCachedPromise, useCachedState } from "@raycast/utils";
+import ItemForm from "./components/ItemForm";
 import { ItemCategoryDropdownTypes, ItemListContent } from "./types";
 
 function ListItemActions(props: ItemListContent) {
@@ -78,7 +79,6 @@ function getListItemSubtitle(props: ItemListContent) {
 export default function ListItems() {
   const [category, setCategory] = useCachedState<ItemCategoryDropdownTypes>("selected_category", DEFAULT_CATEGORY);
   const { data: items = [], isLoading, revalidate } = useCachedPromise(findItems);
-
   const categoryItems = items?.filter(({ item, archived, favored }) => {
     if (category === "null") return true;
     else if (category === "favored") return favored;
@@ -104,7 +104,8 @@ export default function ListItems() {
         />
       ) : (
         categoryItems.map((props) => {
-          const { id, item, path, filename, favored, archived } = props;
+          const { id, item, path, filename, favored, archived, modified, created } = props;
+          const modifiedDate = new Date(modified);
 
           return (
             <List.Item
@@ -118,16 +119,49 @@ export default function ListItems() {
               accessories={[
                 favored ? { icon: { source: Icon.Stars, tintColor: Color.Yellow }, tooltip: "Favorite item" } : {},
                 archived ? { icon: { source: Icon.Tray, tintColor: Color.Yellow }, tooltip: "Archived item" } : {},
+                modified ? { date: modifiedDate, tooltip: `Last modified at ${modifiedDate}` } : {},
               ]}
               actions={
                 <ActionPanel title="Item actions">
                   <ListItemActions {...props} />
-                  <Action
-                    title="Sync Items"
-                    icon={Icon.RotateClockwise}
-                    onAction={revalidate}
-                    shortcut={{ modifiers: ["cmd"], key: "r" }}
-                  />
+                  <ActionPanel.Section title="Management zone">
+                    <Action.Push
+                      title="Edit Item"
+                      icon={Icon.Pencil}
+                      target={
+                        <ItemForm
+                          defaultValues={{ filename, favored, archived, ...item }}
+                          path={path}
+                          modified={modified}
+                          created={created}
+                          revalidate={revalidate}
+                        />
+                      }
+                      shortcut={{ modifiers: ["cmd"], key: "e" }}
+                    />
+                    <Action
+                      title={favored ? "Remove From Favorite" : "Add to Favorite"}
+                      icon={Icon.Stars}
+                      onAction={() => {
+                        console.log("mark");
+                      }}
+                      shortcut={{ modifiers: ["cmd"], key: "d" }}
+                    />
+                    <Action
+                      title={archived ? "Remove From Archived" : "Add to Archived"}
+                      icon={Icon.Tray}
+                      onAction={() => {
+                        console.log("archive");
+                      }}
+                      shortcut={{ modifiers: ["cmd"], key: "s" }}
+                    />
+                    <Action
+                      title="Sync Items"
+                      icon={Icon.RotateClockwise}
+                      onAction={revalidate}
+                      shortcut={{ modifiers: ["cmd"], key: "r" }}
+                    />
+                  </ActionPanel.Section>
                   <ActionPanel.Section title="Danger zone">
                     <Action.Trash paths={path} shortcut={{ modifiers: ["ctrl"], key: "x" }} onTrash={revalidate} />
                   </ActionPanel.Section>
