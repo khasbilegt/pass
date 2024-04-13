@@ -26,7 +26,6 @@ export type ItemContent =
 export type ItemFileContent = {
   favored: boolean;
   archived: boolean;
-  filename: string;
   item: ItemContent;
   created: number;
   modified: number;
