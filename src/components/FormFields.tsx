@@ -3,7 +3,7 @@ import { Form } from "@raycast/api";
 import { useState } from "react";
 
 function LoginCategoryFields({ defaultValues }: { defaultValues?: ExtractCategory<"login"> }) {
-  const [password, setPassword] = useState(defaultValues?.password ?? "I 4M SH3R L0CK3D");
+  const [password, setPassword] = useState(defaultValues?.password);
 
   return (
     <>
@@ -22,10 +22,10 @@ function LoginCategoryFields({ defaultValues }: { defaultValues?: ExtractCategor
       <Form.PasswordField
         id="password"
         title="Password"
-        placeholder="· · · · · · · · · · · ·"
+        placeholder="I 4M SH3R L0CK3D"
         value={password}
         onChange={setPassword}
-        info={`Raw value: ${password}`}
+        info={password ? `Raw value: ${password}` : undefined}
       />
       <Form.TextField
         id="otp"
@@ -38,33 +38,46 @@ function LoginCategoryFields({ defaultValues }: { defaultValues?: ExtractCategor
 }
 
 function PasswordCategoryFields({ defaultValues }: { defaultValues?: ExtractCategory<"password"> }) {
-  const [password, setPassword] = useState(defaultValues?.password ?? "I 4M SH3R L0CK3D");
+  const [password, setPassword] = useState(defaultValues?.password);
 
   return (
     <Form.PasswordField
       id="password"
       title="Password"
+      placeholder="I 4M SH3R L0CK3D"
       value={password}
       onChange={setPassword}
-      info={`Raw value: ${password}`}
+      info={password ? `Raw value: ${password}` : undefined}
     />
   );
 }
 
 function CardCategoryFields({ defaultValues }: { defaultValues?: ExtractCategory<"card"> }) {
-  const [cvv, setCVV] = useState(defaultValues?.cvv ?? "000");
+  const [cvv, setCVV] = useState(defaultValues?.cvv);
 
   return (
     <>
-      <Form.TextField id="name" title="Name" defaultValue={defaultValues?.name} />
-      <Form.TextField id="number" title="Card Number" defaultValue={defaultValues?.number} />
+      <Form.TextField id="name" title="Name" placeholder="Sherlock Holmes" defaultValue={defaultValues?.name} />
+      <Form.TextField
+        id="number"
+        title="Card Number"
+        placeholder="4111 1111 1111 1111"
+        defaultValue={defaultValues?.number}
+      />
       <Form.DatePicker
         id="expiration"
         title="Expiry Date"
         type={Form.DatePicker.Type.Date}
         defaultValue={defaultValues?.expiration ? new Date(defaultValues.expiration) : undefined}
       />
-      <Form.PasswordField id="cvv" title="CVV" value={cvv} onChange={setCVV} info={`Raw value: ${cvv}`} />
+      <Form.PasswordField
+        id="cvv"
+        title="CVV"
+        placeholder="221"
+        value={cvv}
+        onChange={setCVV}
+        info={cvv ? `Raw value: ${cvv}` : undefined}
+      />
     </>
   );
 }
