@@ -133,15 +133,7 @@ export default function ListItems() {
                     <Action.Push
                       title="Edit Item"
                       icon={Icon.Pencil}
-                      target={
-                        <ItemForm
-                          defaultValues={{ filename, favored, archived, ...item }}
-                          path={path}
-                          modified={modified}
-                          created={created}
-                          revalidate={revalidate}
-                        />
-                      }
+                      target={<ItemForm {...props} revalidate={revalidate} />}
                       shortcut={{ modifiers: ["cmd"], key: "e" }}
                     />
                     <Action

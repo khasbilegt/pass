@@ -1,4 +1,4 @@
-import { ExtractCategory, ItemCategoryType, ItemFormValues } from "@/types";
+import { ExtractCategory, ItemCategoryType, ItemCreateFormValues } from "@/types";
 import { Form } from "@raycast/api";
 import { useState } from "react";
 
@@ -122,7 +122,7 @@ function NoteCategoryFields({ defaultValues }: { defaultValues?: ExtractCategory
   );
 }
 
-export function FormFields({ type, draftValues }: { type: ItemCategoryType; draftValues?: ItemFormValues }) {
+export function FormFields({ type, draftValues }: { type: ItemCategoryType; draftValues?: ItemCreateFormValues }) {
   switch (type) {
     case "identity":
       return <IdentityCategoryFields defaultValues={draftValues as ExtractCategory<"identity">} />;

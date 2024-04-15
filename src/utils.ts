@@ -1,4 +1,4 @@
-import { getPreferenceValues, Icon, LocalStorage } from "@raycast/api";
+import { Clipboard, getPreferenceValues, Icon, LocalStorage, showToast, Toast } from "@raycast/api";
 import { Glob } from "glob";
 import { createHash } from "node:crypto";
 import fs from "node:fs";
@@ -120,5 +120,33 @@ export function getCategoryIcon(category: ItemCategoryType) {
       return Icon.Paragraph;
     default:
       return Icon.Key;
+  }
+}
+
+export async function toastWrapper(
+  title: { init: string; success: string; error: string },
+  primary: () => Promise<void>,
+  callback?: () => void,
+) {
+  const toast = await showToast({ style: Toast.Style.Animated, title: title.init });
+
+  try {
+    await primary();
+    toast.style = Toast.Style.Success;
+    toast.title = title.success;
+    callback && (await callback());
+  } catch (error) {
+    toast.style = Toast.Style.Failure;
+    toast.title = title.error;
+    if (error instanceof Error) {
+      toast.message = error.message;
+      toast.primaryAction = {
+        title: "Copy logs",
+        onAction: async (toast) => {
+          await Clipboard.copy(error.message);
+          toast.hide();
+        },
+      };
+    }
   }
 }
