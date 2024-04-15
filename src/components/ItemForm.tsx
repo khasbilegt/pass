@@ -11,9 +11,10 @@ export function ItemForm(props: ItemListContent & { revalidate: () => void }) {
   const [type] = useState<ItemCategoryType>(defaultValues.item.category ?? "login");
 
   async function onSubmit(props: ItemUpdateFormValues) {
-    await itemUpdate(defaultValues, props);
-    revalidate();
-    pop();
+    await itemUpdate(defaultValues, props, () => {
+      revalidate();
+      pop();
+    });
   }
 
   return (

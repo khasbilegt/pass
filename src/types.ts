@@ -31,11 +31,10 @@ export type ItemFileContent = {
 
 export type ItemListContent = { path: string } & ItemFileContent;
 
-export type ItemDefaultFormValues = {
+export type ItemCreateFormValues = {
   filename: string;
   favored: boolean;
   archived: boolean;
-};
+} & ItemContent;
 
-export type ItemCreateFormValues = ItemDefaultFormValues & ItemContent;
-export type ItemUpdateFormValues = ItemDefaultFormValues & Partial<ItemContent>;
+export type ItemUpdateFormValues = Partial<ItemCreateFormValues>;

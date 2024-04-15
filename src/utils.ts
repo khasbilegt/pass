@@ -126,7 +126,6 @@ export function getCategoryIcon(category: ItemCategoryType) {
 export async function toastWrapper(
   title: { init: string; success: string; error: string },
   primary: () => Promise<void>,
-  callback?: () => void,
 ) {
   const toast = await showToast({ style: Toast.Style.Animated, title: title.init });
 
@@ -134,7 +133,6 @@ export async function toastWrapper(
     await primary();
     toast.style = Toast.Style.Success;
     toast.title = title.success;
-    callback && (await callback());
   } catch (error) {
     toast.style = Toast.Style.Failure;
     toast.title = title.error;

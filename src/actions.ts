@@ -5,7 +5,10 @@ import { randomUUID } from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 
-export async function itemCreate({ filename, favored, archived, ...values }: ItemCreateFormValues) {
+export async function itemCreate(
+  { filename, favored, archived, ...values }: ItemCreateFormValues,
+  callback?: () => void,
+) {
   const create = async () => {
     const now = Date.now();
     const data: ItemFileContent = {
@@ -24,6 +27,7 @@ export async function itemCreate({ filename, favored, archived, ...values }: Ite
 
     await fs.promises.mkdir(dirPath, { recursive: true });
     await fs.promises.writeFile(filePath, result as Uint8Array);
+    callback && (await callback());
   };
 
   await toastWrapper(
@@ -36,7 +40,11 @@ export async function itemCreate({ filename, favored, archived, ...values }: Ite
   );
 }
 
-export async function itemUpdate(defaultValues: ItemListContent, updatedValues: ItemUpdateFormValues) {
+export async function itemUpdate(
+  defaultValues: ItemListContent,
+  updatedValues: ItemUpdateFormValues,
+  callback?: () => void,
+) {
   const update = async () => {
     const { filename, favored, archived, ...values } = updatedValues;
     const now = Date.now();
@@ -53,6 +61,7 @@ export async function itemUpdate(defaultValues: ItemListContent, updatedValues: 
     const result = await encryptData(payload);
 
     await fs.promises.writeFile(defaultValues.path, result as Uint8Array);
+    callback && (await callback());
   };
 
   await toastWrapper(

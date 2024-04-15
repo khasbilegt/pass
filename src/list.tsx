@@ -2,6 +2,7 @@ import { CategoryDropdown, ItemDetail, ItemForm } from "@/components";
 import { CATEGORIES, findItems, getCategoryIcon } from "@/utils";
 import { Action, ActionPanel, Color, Icon, List } from "@raycast/api";
 import { useCachedPromise, useCachedState } from "@raycast/utils";
+import { itemUpdate } from "./actions";
 import { ItemCategoryDropdownTypes, ItemListContent } from "./types";
 
 function ListItemActions(props: ItemListContent) {
@@ -139,17 +140,21 @@ export default function ListItems() {
                     <Action
                       title={favored ? "Remove From Favorite" : "Add to Favorite"}
                       icon={Icon.Stars}
-                      onAction={() => {
-                        console.log("mark");
-                      }}
-                      shortcut={{ modifiers: ["cmd"], key: "d" }}
+                      onAction={async () =>
+                        await itemUpdate(props, { favored: !favored, archived: favored ? archived : false }, revalidate)
+                      }
+                      shortcut={{ modifiers: ["cmd"], key: "f" }}
                     />
                     <Action
                       title={archived ? "Remove From Archived" : "Add to Archived"}
                       icon={Icon.Tray}
-                      onAction={() => {
-                        console.log("archive");
-                      }}
+                      onAction={async () =>
+                        await itemUpdate(
+                          props,
+                          { archived: !archived, favored: archived ? favored : false },
+                          revalidate,
+                        )
+                      }
                       shortcut={{ modifiers: ["cmd"], key: "s" }}
                     />
                     <Action
