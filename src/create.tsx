@@ -27,7 +27,7 @@ export default function Command(props: LaunchProps<{ draftValues: ItemFormValues
         modified: now,
       };
       const payload = JSON.stringify(data);
-      const result = await encryptData(payload, "binary");
+      const result = await encryptData(payload);
       const filePath = path.join(StorePath, type, `${slugify(filename)}.gpg`);
       const dirPath = path.dirname(filePath);
 

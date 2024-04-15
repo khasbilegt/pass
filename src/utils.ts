@@ -68,12 +68,17 @@ export async function decryptData(payload: Buffer) {
   return data;
 }
 
-export async function encryptData(payload: string, format: "armored" | "binary" = "armored") {
+export async function encryptData(payload: string) {
   const [publicKey, privateKey] = await Promise.all([await getPublicKey(), await getPrivateKey()]);
 
   const buffer = Buffer.from(payload, "utf8");
   const message = await openpgp.createMessage({ binary: new Uint8Array(buffer) });
-  const encrypted = await openpgp.encrypt({ message, encryptionKeys: publicKey, signingKeys: privateKey, format });
+  const encrypted = await openpgp.encrypt({
+    message,
+    encryptionKeys: publicKey,
+    signingKeys: privateKey,
+    format: "binary",
+  });
   return encrypted;
 }
 
