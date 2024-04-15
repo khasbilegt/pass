@@ -97,7 +97,7 @@ export async function findItems() {
     }
   }
 
-  return results.sort((a, b) => b.created - a.created);
+  return results;
 }
 
 export function hash(str: string) {
