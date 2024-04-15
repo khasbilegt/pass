@@ -17,7 +17,7 @@ function ListItemActions(props: ItemListContent) {
             <Action.CopyToClipboard
               title="Copy OTP"
               content={item.password}
-              shortcut={{ modifiers: ["cmd", "shift"], key: "c" }}
+              shortcut={{ modifiers: ["cmd", "shift"], key: "enter" }}
             />
           )}
         </>
@@ -34,7 +34,7 @@ function ListItemActions(props: ItemListContent) {
           <Action.CopyToClipboard
             title="Copy Expiry Date"
             content={item.expiration}
-            shortcut={{ modifiers: ["cmd", "shift"], key: "c" }}
+            shortcut={{ modifiers: ["cmd", "shift"], key: "enter" }}
           />
         </>
       );
@@ -46,7 +46,7 @@ function ListItemActions(props: ItemListContent) {
           <Action.CopyToClipboard
             title="Copy Address"
             content={item.address}
-            shortcut={{ modifiers: ["cmd", "shift"], key: "c" }}
+            shortcut={{ modifiers: ["cmd", "shift"], key: "enter" }}
           />
         </>
       );
