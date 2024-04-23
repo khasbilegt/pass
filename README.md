@@ -1,3 +1,3 @@
 # Pass
 
-Raycast companion extension for pass (the standard unix password manager)
+The extension of pass (the standard unix password manager) for Raycast

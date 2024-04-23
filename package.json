@@ -2,7 +2,7 @@
   "$schema": "https://www.raycast.com/schemas/extension.json",
   "name": "pass",
   "title": "Pass",
-  "description": "Raycast companion extension for pass (the standard unix password manager)",
+  "description": "The extension of pass (the standard unix password manager) for Raycast",
   "icon": "shield.png",
   "author": "khasbilegt",
   "categories": [
