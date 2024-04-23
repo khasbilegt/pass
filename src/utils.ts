@@ -1,4 +1,4 @@
-import { Clipboard, getPreferenceValues, Icon, LocalStorage, showToast, Toast } from "@raycast/api";
+import { Clipboard, Icon, LocalStorage, Toast, captureException, getPreferenceValues, showToast } from "@raycast/api";
 import { Glob } from "glob";
 import { createHash } from "node:crypto";
 import fs from "node:fs";
@@ -93,6 +93,7 @@ export async function findItems() {
         results.push({ ...payload, path: file });
       }
     } catch (error) {
+      captureException(error);
       console.error("Invalid schema!", file);
     }
   }
@@ -134,6 +135,7 @@ export async function toastWrapper(
     toast.style = Toast.Style.Success;
     toast.title = title.success;
   } catch (error) {
+    captureException(error);
     toast.style = Toast.Style.Failure;
     toast.title = title.error;
     if (error instanceof Error) {

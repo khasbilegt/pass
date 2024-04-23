@@ -1,61 +1,10 @@
-import { CategoryDropdown, ItemDetail, ItemForm } from "@/components";
+import { CategoryDropdown, ItemDetail, ItemForm, ListItemCopyActions, ListItemPasteActions } from "@/components";
 import { CATEGORIES, findItems, getCategoryIcon } from "@/utils";
 import { Action, ActionPanel, Color, Icon, List } from "@raycast/api";
 import { useCachedPromise, useCachedState } from "@raycast/utils";
 import { itemUpdate } from "./actions";
+
 import { ItemCategoryDropdownTypes, ItemListContent } from "./types";
-
-function ListItemActions(props: ItemListContent) {
-  const { item } = props;
-
-  switch (item.category) {
-    case "login":
-      return (
-        <>
-          <Action.CopyToClipboard title="Copy Username" content={item.username} />
-          <Action.CopyToClipboard title="Copy Password" content={item.password} concealed />
-          {item.otp ?? (
-            <Action.CopyToClipboard
-              title="Copy OTP"
-              content={item.password}
-              shortcut={{ modifiers: ["cmd", "shift"], key: "enter" }}
-            />
-          )}
-        </>
-      );
-    case "password":
-      return <Action.CopyToClipboard title="Copy Password" content={item.password} />;
-    case "note":
-      return <Action.CopyToClipboard title="Copy Note" content={item.note} />;
-    case "card":
-      return (
-        <>
-          <Action.CopyToClipboard title="Copy Card Number" content={item.number} />
-          <Action.CopyToClipboard title="Copy CVV" content={item.cvv} concealed />
-          <Action.CopyToClipboard
-            title="Copy Expiry Date"
-            content={item.expiration}
-            shortcut={{ modifiers: ["cmd", "shift"], key: "enter" }}
-          />
-        </>
-      );
-    case "identity":
-      return (
-        <>
-          <Action.CopyToClipboard title="Copy Fullname" content={`${item.firstname} ${item.lastname}`} />
-          <Action.CopyToClipboard title="Copy Phone Number" content={item.tel} concealed />
-          <Action.CopyToClipboard
-            title="Copy Address"
-            content={item.address}
-            shortcut={{ modifiers: ["cmd", "shift"], key: "enter" }}
-          />
-        </>
-      );
-    case "document":
-    default:
-      return null;
-  }
-}
 
 function getListItemSubtitle(props: ItemListContent) {
   const { item } = props;
@@ -117,7 +66,7 @@ export default function ListItems() {
         />
       ) : (
         Object.entries(sectionItems).map(([title, sectionItems]) => (
-          <List.Section title={title}>
+          <List.Section key={title} title={title}>
             {sectionItems
               .sort((a, b) => b.modified - a.modified)
               .map((props) => {
@@ -144,14 +93,17 @@ export default function ListItems() {
                     ]}
                     actions={
                       <ActionPanel title="Item actions">
-                        <ListItemActions {...props} />
-                        <Action.Push
-                          title="Open Item"
-                          icon={Icon.ArrowRightCircle}
-                          target={<ItemDetail {...props} />}
-                          shortcut={{ modifiers: ["cmd"], key: "o" }}
-                        />
-                        <ActionPanel.Section title="Management zone">
+                        <ListItemCopyActions {...props} />
+                        <ActionPanel.Section title="Paste actions">
+                          <ListItemPasteActions {...props} />
+                        </ActionPanel.Section>
+                        <ActionPanel.Section title="Management actions">
+                          <Action.Push
+                            title="Open Item"
+                            icon={Icon.ArrowRightCircle}
+                            target={<ItemDetail {...props} />}
+                            shortcut={{ modifiers: ["cmd"], key: "o" }}
+                          />
                           <Action.Push
                             title="Edit Item"
                             icon={Icon.Pencil}
