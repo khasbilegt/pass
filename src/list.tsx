@@ -7,8 +7,8 @@ import {
   ListItemPasteActions,
 } from "@/components";
 import { CATEGORIES, findItems, getCategoryIcon } from "@/utils";
-import { Action, ActionPanel, Color, Icon, List } from "@raycast/api";
-import { useCachedPromise, useCachedState } from "@raycast/utils";
+import { Action, ActionPanel, BrowserExtension, Color, Icon, List } from "@raycast/api";
+import { useCachedPromise, useCachedState, usePromise } from "@raycast/utils";
 import { itemUpdate } from "./actions";
 
 import { ItemCategoryDropdownTypes, ItemListContent } from "./types";
@@ -35,6 +35,7 @@ function getListItemSubtitle(props: ItemListContent) {
 export default function ListItems() {
   const [category, setCategory] = useCachedState<ItemCategoryDropdownTypes>("selected_category", "favored");
   const { data: items = [], isLoading, revalidate } = useCachedPromise(findItems);
+  const { data: tabs = [], revalidate: tabsRevalidate } = usePromise(BrowserExtension.getTabs);
 
   const categoryItems = items?.filter(({ item, archived, favored }) => {
     if (category === "null") return !archived;
@@ -55,6 +56,15 @@ export default function ListItems() {
     { "Favorite items": [], "Other items": [] },
   );
 
+  const activeTab = tabs?.find((tab) => tab.active);
+  const tabItems = activeTab && {
+    ["Active tab: " + activeTab.title ?? activeTab.url]: items.filter(
+      (item) => item.item.category === "login" && item.item.website.includes(new URL(activeTab.url).hostname),
+    ),
+  };
+
+  const extendedSectionItems = { ...tabItems, ...sectionItems };
+
   function onCategoryChange(value: string) {
     category !== value && setCategory(value as ItemCategoryDropdownTypes);
   }
@@ -72,7 +82,7 @@ export default function ListItems() {
           description="Any items you have added in your password store will be listed here."
         />
       ) : (
-        Object.entries(sectionItems).map(([title, sectionItems]) => (
+        Object.entries(extendedSectionItems).map(([title, sectionItems]) => (
           <List.Section key={title} title={title}>
             {sectionItems
               .sort((a, b) => b.modified - a.modified)
@@ -115,7 +125,15 @@ export default function ListItems() {
                           <Action.Push
                             title="Edit Item"
                             icon={Icon.Pencil}
-                            target={<ItemForm {...props} revalidate={revalidate} />}
+                            target={
+                              <ItemForm
+                                {...props}
+                                revalidate={() => {
+                                  revalidate();
+                                  tabsRevalidate();
+                                }}
+                              />
+                            }
                             shortcut={{ modifiers: ["cmd"], key: "e" }}
                           />
                           <Action
