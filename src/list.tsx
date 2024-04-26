@@ -125,15 +125,7 @@ export default function ListItems() {
                           <Action.Push
                             title="Edit Item"
                             icon={Icon.Pencil}
-                            target={
-                              <ItemForm
-                                {...props}
-                                revalidate={() => {
-                                  revalidate();
-                                  tabsRevalidate();
-                                }}
-                              />
-                            }
+                            target={<ItemForm {...props} revalidate={revalidate} />}
                             shortcut={{ modifiers: ["cmd"], key: "e" }}
                           />
                           <Action
@@ -163,7 +155,10 @@ export default function ListItems() {
                           <Action
                             title="Sync Items"
                             icon={Icon.RotateClockwise}
-                            onAction={revalidate}
+                            onAction={() => {
+                              revalidate();
+                              tabsRevalidate();
+                            }}
                             shortcut={{ modifiers: ["cmd"], key: "r" }}
                           />
                         </ActionPanel.Section>
