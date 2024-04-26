@@ -1,4 +1,11 @@
-import { CategoryDropdown, ItemDetail, ItemForm, ListItemCopyActions, ListItemPasteActions } from "@/components";
+import {
+  CategoryDropdown,
+  ItemDetail,
+  ItemForm,
+  ListItemCopyActions,
+  ListItemManagementActions,
+  ListItemPasteActions,
+} from "@/components";
 import { CATEGORIES, findItems, getCategoryIcon } from "@/utils";
 import { Action, ActionPanel, Color, Icon, List } from "@raycast/api";
 import { useCachedPromise, useCachedState } from "@raycast/utils";
@@ -98,6 +105,7 @@ export default function ListItems() {
                           <ListItemPasteActions {...props} />
                         </ActionPanel.Section>
                         <ActionPanel.Section title="Management actions">
+                          <ListItemManagementActions {...props} />
                           <Action.Push
                             title="Open Item"
                             icon={Icon.ArrowRightCircle}

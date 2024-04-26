@@ -137,3 +137,19 @@ export function ListItemPasteActions(props: ItemListContent) {
       return null;
   }
 }
+
+export function ListItemManagementActions(props: ItemListContent) {
+  const { item } = props;
+
+  switch (item.category) {
+    case "login":
+      return <Action.OpenInBrowser url={item.website} shortcut={{ modifiers: ["cmd", "shift"], key: "o" }} />;
+    case "password":
+    case "note":
+    case "card":
+    case "identity":
+    case "document":
+    default:
+      return null;
+  }
+}
