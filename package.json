@@ -53,11 +53,10 @@
     }
   ],
   "dependencies": {
-    "@raycast/api": "^1.69.0",
+    "@raycast/api": "^1.72.1",
     "@raycast/utils": "^1.14.0",
     "@sindresorhus/slugify": "^2.2.1",
     "glob": "^10.3.12",
-    "gpg": "^0.6.0",
     "openpgp": "^5.11.1"
   },
   "devDependencies": {
